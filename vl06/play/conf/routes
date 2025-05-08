@@ -3,6 +3,13 @@
 # ~~~~
 
 # An example controller showing how to write asynchronous code
-GET         /message             controllers.HelloWorldController.message
-GET         /message/:msg        controllers.HelloWorldController.messageDynamic(msg: String)
-POST        /person              controllers.HelloWorldController.getPerson
+GET           /message             controllers.HelloWorldController.message
+GET           /message/:msg        controllers.HelloWorldController.messageDynamic(msg: String)
+POST          /person              controllers.HelloWorldController.getPerson
+
+# Todo
+POST          /todos               controllers.TodoController.createTodo
+GET           /todos/:id           controllers.TodoController.getTodoById(id: Long)
+GET           /todos               controllers.TodoController.getAllTodos
+PATCH         /todos/:id           controllers.TodoController.updateTodo(id: Long)
+DELETE        /todos/:id           controllers.TodoController.deleteTodo(id: Long)

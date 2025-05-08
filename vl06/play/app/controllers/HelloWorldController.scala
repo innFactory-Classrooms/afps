@@ -10,8 +10,6 @@ import javax.inject.*
 import scala.concurrent.duration.*
 import scala.concurrent.{ExecutionContext, Future, Promise}
 
-
-
 @Singleton
 class HelloWorldController @Inject() (
     cc: ControllerComponents,

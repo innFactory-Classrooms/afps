@@ -6,6 +6,7 @@ lazy val root = (project in file("."))
     scalaVersion := "3.7.0",
     libraryDependencies ++= Seq(
       guice,
-      "org.typelevel" %% "cats-core" % "2.13.0"
+      "org.typelevel"      %% "cats-core" % "2.13.0",
+      "io.github.iltotore" %% "iron"      % "3.0.1"
     )
   )

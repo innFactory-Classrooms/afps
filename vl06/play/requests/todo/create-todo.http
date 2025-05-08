@@ -1,0 +1,7 @@
+POST http://localhost:9000/todos
+Content-Type: application/json
+
+{
+  "title": "Buy groceries",
+  "description": "Milk"
+}
