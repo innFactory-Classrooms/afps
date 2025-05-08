@@ -1,1 +1,6 @@
-GET http://localhost:9000/message/Hello
+POST http://localhost:9000/person
+Content-Type: application/json
+
+{
+  "firstName": "42"
+}
