@@ -1,20 +1,11 @@
 package repositories
 
 import cats.data.EitherT
-import com.google.inject.{ImplementedBy, Inject}
+import com.google.inject.Inject
 import domain.models.*
 
 import scala.collection.mutable
 import scala.concurrent.{ExecutionContext, Future}
-
-@ImplementedBy(classOf[InMemoryTodoRepository])
-trait TodoRepository {
-  def create(dto: TodoCreateDto): EitherT[Future, TodoError, Todo]
-  def getById(id: Long): EitherT[Future, TodoError, Todo]
-  def getAll(): EitherT[Future, TodoError, Seq[Todo]]
-  def update(id: Long, dto: TodoUpdateDto): EitherT[Future, TodoError, Todo]
-  def delete(id: Long): EitherT[Future, TodoError, Unit]
-}
 
 class InMemoryTodoRepository @Inject() ()(using ExecutionContext) extends TodoRepository {
   private val todos: mutable.Map[Long, Todo] = mutable.Map.empty
