@@ -26,7 +26,7 @@ class SlickTodoRepository @Inject() (db: Database)(using ExecutionContext) exten
   // Übung
   override def getById(id: Long): EitherT[Future, TodoError, Todo] = ???
 
-  // Übung (optional)
+  // Übung
   // - Controller um einen query parameter - "done" erweitern und bis hier durchreichen
   // - Nur Todos ausgeben welche dem Filter entsprechen (Erinnerung: TableQuery ist an Collections angelehnt)
   override def getAll(): EitherT[Future, TodoError, Seq[Todo]] = {
@@ -55,6 +55,7 @@ class SlickTodoRepository @Inject() (db: Database)(using ExecutionContext) exten
       }
   )
 
+  // Tipp: Könnte mit "chimney" automatisiert werden: https://chimney.readthedocs.io/
   private def mapRowToTodo(row: Tables.TodoRow) = Todo(
     id = row.id,
     title = row.title,
