@@ -11,7 +11,7 @@ import scala.concurrent.{ExecutionContext, Future}
 trait TodoService {
   def createTodo(dto: TodoCreateDto): EitherT[Future, TodoError, Todo]
   def getTodoById(id: Long): EitherT[Future, TodoError, Todo]
-  def getAllTodos(): EitherT[Future, TodoError, Seq[Todo]]
+  def getAllTodos(done: Option[Boolean]): EitherT[Future, TodoError, Seq[Todo]]
   def updateTodo(id: Long, dto: TodoUpdateDto): EitherT[Future, TodoError, Todo]
   def deleteTodo(id: Long): EitherT[Future, TodoError, Unit]
 }
@@ -26,8 +26,8 @@ class TodoServiceImpl @Inject() (todoRepository: TodoRepository)(using Execution
   override def getTodoById(id: Long): EitherT[Future, TodoError, Todo] =
     todoRepository.getById(id)
 
-  override def getAllTodos(): EitherT[Future, TodoError, Seq[Todo]] =
-    todoRepository.getAll()
+  override def getAllTodos(done: Option[Boolean]): EitherT[Future, TodoError, Seq[Todo]] =
+    todoRepository.getAll(done)
 
   override def updateTodo(id: Long, dto: TodoUpdateDto): EitherT[Future, TodoError, Todo] = for {
     _    <- dto.validate

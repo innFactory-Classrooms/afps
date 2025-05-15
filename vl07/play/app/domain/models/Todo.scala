@@ -4,7 +4,8 @@ case class Todo(
     id: Long,
     title: String,
     description: String,
-    done: Boolean
+    done: Boolean,
+    category: Option[Category]
 )
 
 object Todo {

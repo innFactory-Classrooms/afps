@@ -28,8 +28,9 @@ class TodoController @Inject() (
     toResult(todoService.getTodoById(id), (todo) => Ok(Json.toJson(todo)))
   }
 
-  def getAllTodos: Action[AnyContent] = Action.async {
-    toResult(todoService.getAllTodos(), (todos) => Ok(Json.toJson(todos)))
+  def getAllTodos: Action[AnyContent] = Action.async { request =>
+    val doneParam = request.getQueryString("done").flatMap(_.toBooleanOption)
+    toResult(todoService.getAllTodos(doneParam), (todos) => Ok(Json.toJson(todos)))
   }
 
   def updateTodo(id: Long): Action[JsValue] = Action(parse.json).async { request =>

@@ -14,7 +14,7 @@ class InMemoryTodoRepository @Inject() ()(using ExecutionContext) extends TodoRe
   override def create(dto: TodoCreateDto): EitherT[Future, TodoError, Todo] = EitherT {
     Future {
       currentId += 1
-      val todo = Todo(currentId, dto.title, dto.description, false)
+      val todo = Todo(currentId, dto.title, dto.description, false, None)
       todos += (currentId -> todo)
       Right(todo)
     }
@@ -26,7 +26,7 @@ class InMemoryTodoRepository @Inject() ()(using ExecutionContext) extends TodoRe
     }
   }
 
-  override def getAll(): EitherT[Future, TodoError, Seq[Todo]] = EitherT {
+  override def getAll(done: Option[Boolean]): EitherT[Future, TodoError, Seq[Todo]] = EitherT {
     Future {
       Right(todos.values.toSeq)
     }
