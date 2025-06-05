@@ -3,8 +3,10 @@ package repositories
 import cats.data.EitherT
 import com.google.inject.Inject
 import domain.models.*
-import generated.db.XPostgresProfile.api.*
 import generated.db.MainTables
+import generated.db.XPostgresProfile.api.*
+import io.scalaland.chimney.Transformer
+import io.scalaland.chimney.dsl.*
 import slick.dbio.{DBIOAction, Effect, NoStream}
 import slick.jdbc.JdbcBackend.Database
 
@@ -15,14 +17,14 @@ class SlickTodoRepository @Inject() (db: Database)(using ExecutionContext) exten
   private def todoBaseQuery = MainTables.Todo.joinLeft(MainTables.Category).on((todo, category) => todo.categoryId === category.id)
 
   override def create(dto: TodoCreateDto): EitherT[Future, TodoError, Todo] = {
-    val insertStatement: DBIOAction[MainTables.TodoRow, NoStream, Effect.Write] = (MainTables.Todo returning MainTables.Todo) += MainTables.TodoRow(
-      // Siehe Dokumentation von +=, hier werden Auto-Increment Spalten übersprungen. Wir haben in V001__init.sql die id
-      // Spalte als SERIAL definiert was in einer Postgres DB einer auto-inc Spalte entspricht.
-      id = -1,
-      title = dto.title,
-      description = dto.description,
-      done = false
-    )
+    // Siehe Dokumentation von +=, hier werden Auto-Increment Spalten übersprungen. Wir haben in V001__init.sql die id
+    // Spalte als SERIAL definiert was in einer Postgres DB einer auto-inc Spalte entspricht.
+    val insertStatement: DBIOAction[MainTables.TodoRow, NoStream, Effect.Write] = (MainTables.Todo returning MainTables.Todo) += dto
+      .into[MainTables.TodoRow]
+      .withFieldConst(_.id, -1)
+      .withFieldConst(_.categoryId, None)
+      .withFieldConst(_.done, false)
+      .transform
     runAsEitherT(for {
       todoRow     <- insertStatement
       todoBaseRow <- todoBaseQuery.filter { case (todo, _) => todo.id === todoRow.id }.result.head
@@ -64,13 +66,7 @@ class SlickTodoRepository @Inject() (db: Database)(using ExecutionContext) exten
       existingRow <- MainTables.Todo.filter(_.id === id.toInt).result.head
       _ <- MainTables.Todo
         .filter(_.id === id.toInt)
-        .update(
-          existingRow.copy(
-            title = dto.title.getOrElse(existingRow.title),
-            description = dto.description.getOrElse(existingRow.description),
-            done = dto.done.getOrElse(existingRow.done)
-          )
-        )
+        .update(existingRow.using(dto).ignoreNoneInPatch.patch)
       updatedRow <- todoBaseQuery.filter { case (todo, _) => todo.id === id.toInt }.result.head
     } yield mapRowToTodo(updatedRow)
     runAsEitherT(action)
@@ -91,19 +87,11 @@ class SlickTodoRepository @Inject() (db: Database)(using ExecutionContext) exten
   )
 
   private def mapRowToTodo(tuple: (MainTables.TodoRow, Option[MainTables.CategoryRow])) = {
-    val (todoRow, categoryRow) = tuple
-    Todo(
-      id = todoRow.id,
-      title = todoRow.title,
-      description = todoRow.description,
-      done = todoRow.done,
-      category = categoryRow.map(row =>
-        Category(
-          id = row.id,
-          name = row.name
-        )
-      )
-    )
+    val (todoRow, categoryRow)   = tuple
+    given Transformer[Int, Long] = _.toLong
+    todoRow
+      .into[Todo]
+      .withFieldConst(_.category, categoryRow.transformInto[Option[Category]])
+      .transform
   }
-  // Tipp: Könnte mit "chimney" automatisiert werden: https://chimney.readthedocs.io/
 }

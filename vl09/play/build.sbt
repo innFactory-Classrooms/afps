@@ -5,7 +5,7 @@ val flywayVersion = "11.8.2"
 val slickVersion  = "3.6.0"
 
 lazy val root = (project in file("."))
-  .enablePlugins(PlayScala)
+  .enablePlugins(PlayScala, DockerPlugin)
   .settings(
     name         := """play-framework""",
     version      := "1.0-SNAPSHOT",
@@ -13,10 +13,14 @@ lazy val root = (project in file("."))
     // Notwendig da sonst ein Versionskonflikt besteht
     dependencyOverrides += "com.fasterxml.jackson.core" % "jackson-databind" % "2.14.3",
     Compile / sourceGenerators += dbGenCached.taskValue,
+    dockerExposedPorts := Seq(9000),
+    dockerBaseImage    := "eclipse-temurin:21.0.5_11-jre-noble",
+    dockerEntrypoint   := Seq("/opt/docker/bin/play-framework", "-Dplay.server.pidfile.path=/dev/null"),
     libraryDependencies ++= Seq(
       guice,
       "org.typelevel"      %% "cats-core" % "2.13.0",
-      "io.github.iltotore" %% "iron"      % "3.0.1"
+      "io.github.iltotore" %% "iron"      % "3.0.1",
+      "io.scalaland"       %% "chimney"   % "1.8.1"
     ) ++ dbDependencies
   )
 
