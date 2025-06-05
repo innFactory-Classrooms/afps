@@ -9,6 +9,7 @@ lazy val root = (project in file("."))
     scalaVersion := "3.7.0",
     // Notwendig da sonst ein Versionskonflikt besteht
     dependencyOverrides += "com.fasterxml.jackson.core" % "jackson-databind" % "2.14.3",
+    (Compile / compile)                                := ((Compile / compile) dependsOn flywayMigrate).value,
     Compile / sourceGenerators += slick.taskValue,
     libraryDependencies ++= Seq(
       guice,
@@ -28,6 +29,13 @@ lazy val root = (project in file("."))
       "com.typesafe.slick" %% "slick-hikaricp" % slickVersion
     )
   )
+
+enablePlugins(FlywayPlugin)
+
+flywayUrl       := "jdbc:postgresql://localhost:5432/test"
+flywayUser      := "test"
+flywayPassword  := "test"
+flywayLocations := Seq("filesystem:src/main/resources/db/migration")
 
 // Basiert auf https://github.com/slick/slick-codegen-example/blob/main/build.sbt
 lazy val slick = taskKey[Seq[File]]("Generate Tables.scala")
