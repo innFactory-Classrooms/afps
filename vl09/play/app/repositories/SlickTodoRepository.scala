@@ -2,19 +2,20 @@ package repositories
 
 import cats.data.EitherT
 import com.google.inject.Inject
-import db.Tables
 import domain.models.*
+import generated.db.XPostgresProfile.api.*
+import generated.db.MainTables
+import slick.dbio.{DBIOAction, Effect, NoStream}
 import slick.jdbc.JdbcBackend.Database
 
 import scala.concurrent.{ExecutionContext, Future}
 
 class SlickTodoRepository @Inject() (db: Database)(using ExecutionContext) extends TodoRepository {
-  import slick.jdbc.PostgresProfile.api.*
 
-  private def todoBaseQuery = Tables.Todo.joinLeft(Tables.Category).on((todo, category) => todo.categoryId === category.id)
+  private def todoBaseQuery = MainTables.Todo.joinLeft(MainTables.Category).on((todo, category) => todo.categoryId === category.id)
 
   override def create(dto: TodoCreateDto): EitherT[Future, TodoError, Todo] = {
-    val insertStatement: DBIOAction[Tables.TodoRow, NoStream, Effect.Write] = (Tables.Todo returning Tables.Todo) += Tables.TodoRow(
+    val insertStatement: DBIOAction[MainTables.TodoRow, NoStream, Effect.Write] = (MainTables.Todo returning MainTables.Todo) += MainTables.TodoRow(
       // Siehe Dokumentation von +=, hier werden Auto-Increment Spalten übersprungen. Wir haben in V001__init.sql die id
       // Spalte als SERIAL definiert was in einer Postgres DB einer auto-inc Spalte entspricht.
       id = -1,
@@ -50,9 +51,9 @@ class SlickTodoRepository @Inject() (db: Database)(using ExecutionContext) exten
       }
       .result
     runAsEitherT(query)
-      // Map des Ergebnisses, hier noch Seq[Tables.TodoRow]
+      // Map des Ergebnisses, hier noch Seq[MainTables.TodoRow]
       .map(
-        // Map auf Sequence Ebene jedes Tables.TodoRow zu einem Todo aus unserer Domain
+        // Map auf Sequence Ebene jedes MainTables.TodoRow zu einem Todo aus unserer Domain
         _.map(mapRowToTodo)
       )
   }
@@ -60,8 +61,8 @@ class SlickTodoRepository @Inject() (db: Database)(using ExecutionContext) exten
   // Übung
   override def update(id: Long, dto: TodoUpdateDto): EitherT[Future, TodoError, Todo] = {
     val action = for {
-      existingRow <- Tables.Todo.filter(_.id === id.toInt).result.head
-      _ <- Tables.Todo
+      existingRow <- MainTables.Todo.filter(_.id === id.toInt).result.head
+      _ <- MainTables.Todo
         .filter(_.id === id.toInt)
         .update(
           existingRow.copy(
@@ -77,7 +78,7 @@ class SlickTodoRepository @Inject() (db: Database)(using ExecutionContext) exten
 
   // Übung
   override def delete(id: Long): EitherT[Future, TodoError, Unit] =
-    runAsEitherT(Tables.Todo.filter(_.id === id.toInt).delete).map(_ => ())
+    runAsEitherT(MainTables.Todo.filter(_.id === id.toInt).delete).map(_ => ())
 
   private def runAsEitherT[R](action: DBIOAction[R, ?, ?]): EitherT[Future, TodoError, R] = EitherT(
     db.run(action)
@@ -89,7 +90,7 @@ class SlickTodoRepository @Inject() (db: Database)(using ExecutionContext) exten
       }
   )
 
-  private def mapRowToTodo(tuple: (Tables.TodoRow, Option[Tables.CategoryRow])) = {
+  private def mapRowToTodo(tuple: (MainTables.TodoRow, Option[MainTables.CategoryRow])) = {
     val (todoRow, categoryRow) = tuple
     Todo(
       id = todoRow.id,
