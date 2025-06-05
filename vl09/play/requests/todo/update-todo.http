@@ -1,0 +1,6 @@
+PATCH http://localhost:9000/todos/1
+Content-Type: application/json
+
+{
+  "title": "Buy groceries and snacks"
+}
