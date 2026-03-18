@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<project version="4">
-  <component name="ScalaCompilerConfiguration">
-    <option name="separateProdTestSources" value="true" />
-    <profile name="sbt 1" modules="afps,afps.main,afps.test,proj-vorlesung,proj-vorlesung-01,proj-vorlesung-01.main,proj-vorlesung-01.test,proj-vorlesung.main,proj-vorlesung.test" />
-  </component>
-</project>
