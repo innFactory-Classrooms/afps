@@ -1,0 +1,8 @@
+POST http://localhost:9000/v1/weather
+Content-Type: application/json
+
+{
+  "name": "Rosenheim",
+  "lat": -47.8564,
+  "lon": 12.1221
+}
