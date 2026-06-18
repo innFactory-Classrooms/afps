@@ -1,0 +1,41 @@
+### Warenkorb-Zustand lesen (anfangs leer)
+GET http://localhost:9000/v1/carts/123456789
+
+### Artikel hinzufügen (empty -> active)
+POST http://localhost:9000/v1/carts/123456788/items
+Content-Type: application/json
+
+{
+  "productId": "p1",
+  "name": "Scala Buch",
+  "quantity": 1,
+  "price": 39.9
+}
+
+### Weiteren Artikel hinzufügen
+POST http://localhost:9000/v1/carts/123456789/items
+Content-Type: application/json
+
+{
+  "productId": "p2",
+  "name": "Kaffee",
+  "quantity": 2,
+  "price": 4.5
+}
+
+### Artikel entfernen
+DELETE http://localhost:9000/v1/carts/123456789/items/p2
+
+### Checkout (active -> checkedOut)
+POST http://localhost:9000/v1/carts/123456789/checkout
+
+### Nach Checkout: Hinzufügen wird ignoriert (bleibt checkedOut)
+POST http://localhost:9000/v1/carts/123456789/items
+Content-Type: application/json
+
+{
+  "productId": "p3",
+  "name": "Tee",
+  "quantity": 1,
+  "price": 3.0
+}

@@ -1,0 +1,17 @@
+# Routes
+# This file defines all application routes (Higher priority routes first)
+# ~~~~
+
+POST        /v1/weather       weather.application.WeatherController.getWeatherForCity()
+
+# Note-Feature (Slick + H2 In-Memory)
+GET         /v1/notes         note.application.NoteController.getAll
+GET         /v1/notes/:id     note.application.NoteController.getById(id: Long)
+POST        /v1/notes         note.application.NoteController.create
+DELETE      /v1/notes/:id     note.application.NoteController.delete(id: Long)
+
+# Cart-Feature (FSM-Aktor, Request/Response per ask)
+GET         /v1/carts/:cartId                       cart.application.CartController.get(cartId: String)
+POST        /v1/carts/:cartId/items                 cart.application.CartController.addItem(cartId: String)
+DELETE      /v1/carts/:cartId/items/:productId      cart.application.CartController.removeItem(cartId: String, productId: String)
+POST        /v1/carts/:cartId/checkout              cart.application.CartController.checkout(cartId: String)

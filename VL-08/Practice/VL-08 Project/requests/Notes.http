@@ -1,0 +1,17 @@
+### Alle Notes lesen
+GET http://localhost:9000/v1/notes
+
+### Neue Note anlegen
+POST http://localhost:9000/v1/notes
+Content-Type: application/json
+
+{
+  "title": "Slick lernen",
+  "done": false
+}
+
+### Einzelne Note lesen
+GET http://localhost:9000/v1/notes/1
+
+### Note löschen
+DELETE http://localhost:9000/v1/notes/1
