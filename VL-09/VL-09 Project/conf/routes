@@ -1,0 +1,9 @@
+# Routes
+# This file defines all application routes (Higher priority routes first)
+# ~~~~
+
+GET        /v1/todos                   todo.application.TodoController.getTodos()
+GET        /v1/todos/nonchunked        todo.application.TodoController.getTodosNonChunked()
+
+GET        /v1/todos/graph             todo.application.TodoController.todosGraph()
+

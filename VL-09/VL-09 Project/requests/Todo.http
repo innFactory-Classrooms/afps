@@ -1,0 +1,2 @@
+### Get all Todos
+GET http://localhost:9000/v1/todos
